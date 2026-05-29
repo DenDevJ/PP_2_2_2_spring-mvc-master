@@ -3,10 +3,7 @@ import web.model.User;
 import web.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.*;
 @Controller
 public class UserController {
     private final UserService userService;
@@ -23,7 +20,8 @@ public class UserController {
         return "users";
     }
     @GetMapping("/addUser")
-    public String showAddForm() {
+    public String showAddForm(Model model) {
+        model.addAttribute("user", new User());
         return "addUser";
     }
     @PostMapping("/addUser")
@@ -35,7 +33,11 @@ public class UserController {
     }
     @GetMapping("/editUser")
     public String showEditForm(@RequestParam("id") Long id, Model model) {
-        model.addAttribute("user", userService.findById(id));
+        User user = userService.findById(id);
+        if (user == null) {
+            return "redirect:/users?error=UserNotFound";
+        }
+        model.addAttribute("user", user);
         return "editUser";
     }
     @PostMapping("/editUser")
